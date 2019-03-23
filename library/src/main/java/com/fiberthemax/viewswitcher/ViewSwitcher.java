@@ -116,7 +116,6 @@ public class ViewSwitcher extends FrameLayout {
     }
 
     void initViewSwitcher() {
-        setWillNotDraw(false);
         setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
         setFocusable(true);
 
