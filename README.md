@@ -24,7 +24,7 @@ Download
         maven { url "https://jitpack.io" }
    }
    dependencies {
-        implementation 'com.github.fiberthemax:ViewSwitcher:v0.5.0'
+        implementation 'com.github.fiberthemax:ViewSwitcher:0.5.0'
    }
 ```
 
