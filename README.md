@@ -13,6 +13,8 @@ Use it the same way as ViewPager.
       
       }
     });
+    
+    viewSwitcher.setCurrentItem(0)
 ```
 Download
 --------
