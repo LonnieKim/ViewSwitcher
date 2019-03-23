@@ -107,15 +107,15 @@ public class ViewSwitcher extends FrameLayout {
 
     public ViewSwitcher(@NonNull Context context) {
         super(context);
-        initViewPager();
+        initViewSwitcher();
     }
 
     public ViewSwitcher(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        initViewPager();
+        initViewSwitcher();
     }
 
-    void initViewPager() {
+    void initViewSwitcher() {
         setWillNotDraw(false);
         setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
         setFocusable(true);
