@@ -1,9 +1,11 @@
-package com.fiberthemax.example;
+package androidx.viewpager.example;
 
 import android.os.Bundle;
 import android.view.MenuItem;
 
-import com.fiberthemax.viewswitcher.ViewSwitcher;
+import com.fiberthemax.example.R;
+
+import androidx.viewpager.widget.ViewSwitcher;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.NonNull;

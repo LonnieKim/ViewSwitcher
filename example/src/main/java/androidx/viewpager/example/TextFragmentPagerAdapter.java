@@ -1,4 +1,4 @@
-package com.fiberthemax.example;
+package androidx.viewpager.example;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

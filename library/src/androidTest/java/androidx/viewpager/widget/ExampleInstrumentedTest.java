@@ -1,4 +1,4 @@
-package com.fiberthemax.example;
+package androidx.viewpager.widget;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.fiberthemax.example", appContext.getPackageName());
+        assertEquals("com.fiberthemax.viewswitcher", appContext.getPackageName());
     }
 }

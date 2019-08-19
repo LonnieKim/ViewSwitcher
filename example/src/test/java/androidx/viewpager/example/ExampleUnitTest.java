@@ -1,4 +1,4 @@
-package com.fiberthemax.viewswitcher;
+package androidx.viewpager.example;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package com.fiberthemax.example;
+package androidx.viewpager.example;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,6 +10,8 @@ import java.util.Objects;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.fiberthemax.example.R;
 
 public class TextFragment extends Fragment {
     private static final String ARG_TEXT = "text";

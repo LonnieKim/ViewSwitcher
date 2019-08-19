@@ -6,9 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context="androidx.viewpager.example.MainActivity">
 
-    <com.fiberthemax.viewswitcher.ViewSwitcher
+    <androidx.viewpager.widget.ViewSwitcher
         android:id="@+id/viewSwitcher"
         android:layout_width="match_parent"
         android:layout_height="0dp"

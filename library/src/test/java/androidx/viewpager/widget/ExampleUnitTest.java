@@ -1,4 +1,4 @@
-package com.fiberthemax.example;
+package androidx.viewpager.widget;
 
 import org.junit.Test;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.fiberthemax.viewswitcher;
+package androidx.viewpager.widget;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -37,7 +37,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.customview.view.AbsSavedState;
-import androidx.viewpager.widget.PagerAdapter;
 
 /**
  * A view switcher similar to a {@link androidx.viewpager.widget.ViewPager}
@@ -134,7 +133,7 @@ public class ViewSwitcher extends FrameLayout {
     public void setAdapter(@Nullable PagerAdapter adapter) {
         if (mAdapter != null) {
             if (mObserver != null) {
-                mAdapter.unregisterDataSetObserver(mObserver);
+                mAdapter.setViewPagerObserver(mObserver);
             }
             mAdapter.startUpdate(this);
             ItemInfo itemInfo = mCurrItemInfo;
@@ -156,7 +155,7 @@ public class ViewSwitcher extends FrameLayout {
             if (mObserver == null) {
                 mObserver = new PagerObserver();
             }
-            mAdapter.registerDataSetObserver(mObserver);
+            mAdapter.setViewPagerObserver(mObserver);
             mPopulatePending = false;
             final boolean wasFirstLayout = mFirstLayout;
             mFirstLayout = true;
