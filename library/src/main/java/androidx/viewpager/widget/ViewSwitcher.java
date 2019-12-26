@@ -30,13 +30,13 @@ import android.view.ViewParent;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.FrameLayout;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.customview.view.AbsSavedState;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A view switcher similar to a {@link androidx.viewpager.widget.ViewPager}
@@ -160,13 +160,14 @@ public class ViewSwitcher extends FrameLayout {
             final boolean wasFirstLayout = mFirstLayout;
             mFirstLayout = true;
             mExpectedAdapterCount = mAdapter.getCount();
-            if (mRestoredCurItem >= 0) {
+
+            if (mRestoredAdapterState != null && mRestoredClassLoader != null) {
                 mAdapter.restoreState(mRestoredAdapterState, mRestoredClassLoader);
-                setCurrentItemInternal(mRestoredCurItem, true);
-                mRestoredCurItem = -1;
                 mRestoredAdapterState = null;
                 mRestoredClassLoader = null;
-            } else if (!wasFirstLayout) {
+            }
+
+            if (!wasFirstLayout) {
                 populate();
             } else {
                 requestLayout();
@@ -390,6 +391,21 @@ public class ViewSwitcher extends FrameLayout {
                     + " Problematic adapter: " + mAdapter.getClass());
         }
 
+        if (mRestoredCurItem >= 0) {
+            int newItem = mRestoredCurItem;
+            mRestoredCurItem = -1;
+            if (mCurrItemInfo != null && mCurItem != newItem) {
+                mAdapter.destroyItem(this, mCurItem, mCurrItemInfo.object);
+            }
+
+            if ((mCurrItemInfo == null || mCurItem != newItem) && N > 0) {
+                mCurrItemInfo = addNewItem(newItem);
+                mCurItem = newItem;
+                dispatchOnPageSelected(newItem);
+                mAdapter.setPrimaryItem(this, mCurItem, mCurrItemInfo.object);
+            }
+        }
+
         if (mCurrItemInfo != null && mCurItem != newCurrentItem) {
             mAdapter.destroyItem(this, mCurItem, mCurrItemInfo.object);
         }
@@ -505,12 +521,12 @@ public class ViewSwitcher extends FrameLayout {
 
         if (mAdapter != null) {
             mAdapter.restoreState(ss.adapterState, ss.loader);
-            setCurrentItemInternal(ss.position, true);
         } else {
-            mRestoredCurItem = ss.position;
             mRestoredAdapterState = ss.adapterState;
             mRestoredClassLoader = ss.loader;
         }
+        mRestoredCurItem = ss.position;
+        mCurItem = ss.position;
     }
 
     @Override
