@@ -160,14 +160,13 @@ public class ViewSwitcher extends FrameLayout {
             final boolean wasFirstLayout = mFirstLayout;
             mFirstLayout = true;
             mExpectedAdapterCount = mAdapter.getCount();
-
-            if (mRestoredAdapterState != null && mRestoredClassLoader != null) {
+            if (mRestoredCurItem >= 0) {
                 mAdapter.restoreState(mRestoredAdapterState, mRestoredClassLoader);
+                setCurrentItemInternal(mRestoredCurItem, true);
+                mRestoredCurItem = -1;
                 mRestoredAdapterState = null;
                 mRestoredClassLoader = null;
-            }
-
-            if (!wasFirstLayout) {
+            } else if (!wasFirstLayout) {
                 populate();
             } else {
                 requestLayout();
@@ -391,29 +390,16 @@ public class ViewSwitcher extends FrameLayout {
                     + " Problematic adapter: " + mAdapter.getClass());
         }
 
-        if (mRestoredCurItem >= 0) {
-            int newItem = mRestoredCurItem;
-            mRestoredCurItem = -1;
-            if (mCurrItemInfo != null && mCurItem != newItem) {
-                mAdapter.destroyItem(this, mCurItem, mCurrItemInfo.object);
-            }
-
-            if ((mCurrItemInfo == null || mCurItem != newItem) && N > 0) {
-                mCurrItemInfo = addNewItem(newItem);
-                mCurItem = newItem;
-                dispatchOnPageSelected(newItem);
-                mAdapter.setPrimaryItem(this, mCurItem, mCurrItemInfo.object);
-            }
-        }
-
         if (mCurrItemInfo != null && mCurItem != newCurrentItem) {
             mAdapter.destroyItem(this, mCurItem, mCurrItemInfo.object);
         }
 
         if ((mCurrItemInfo == null || mCurItem != newCurrentItem) && N > 0) {
             mCurrItemInfo = addNewItem(newCurrentItem);
-            mCurItem = newCurrentItem;
-            dispatchOnPageSelected(newCurrentItem);
+            if (mCurItem != newCurrentItem) {
+                mCurItem = newCurrentItem;
+                dispatchOnPageSelected(newCurrentItem);
+            }
             mAdapter.setPrimaryItem(this, mCurItem, mCurrItemInfo.object);
         }
 
@@ -521,12 +507,12 @@ public class ViewSwitcher extends FrameLayout {
 
         if (mAdapter != null) {
             mAdapter.restoreState(ss.adapterState, ss.loader);
+            setCurrentItemInternal(ss.position, true);
         } else {
+            mRestoredCurItem = ss.position;
             mRestoredAdapterState = ss.adapterState;
             mRestoredClassLoader = ss.loader;
         }
-        mRestoredCurItem = ss.position;
-        mCurItem = ss.position;
     }
 
     @Override
@@ -583,11 +569,20 @@ public class ViewSwitcher extends FrameLayout {
         mInLayout = true;
         populate();
         mInLayout = false;
-    }
+}
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         super.onLayout(changed, l, t, r, b);
+        final int count = getChildCount();
+        for (int i = 0; i < count; i++) {
+            final View child = getChildAt(i);
+            if (child.getVisibility() != GONE) {
+                if (infoForChild(child) == null) {
+                    child.layout(0, 0, 0, 0);
+                }
+            }
+        }
         mFirstLayout = false;
     }
 
