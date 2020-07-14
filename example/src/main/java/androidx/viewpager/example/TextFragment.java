@@ -1,22 +1,25 @@
 package androidx.viewpager.example;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import java.util.Objects;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.fiberthemax.example.R;
 
+import java.util.Objects;
+
 public class TextFragment extends Fragment {
+
+    private static final String TAG = TextFragment.class.getSimpleName();
     private static final String ARG_TEXT = "text";
 
-    private String mText;
+    public String mText;
 
     public TextFragment() {
     }
@@ -49,6 +52,9 @@ public class TextFragment extends Fragment {
         super.onActivityCreated(savedInstanceState);
         TextView textView = Objects.requireNonNull(getView()).findViewById(R.id.textView);
         textView.setText(mText);
+        if (mText.equals("3")) {
+            Log.d(TAG, "onActivityCreate");
+        }
 
     }
 }

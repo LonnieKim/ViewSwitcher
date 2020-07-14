@@ -30,13 +30,13 @@ import android.view.ViewParent;
 import android.view.accessibility.AccessibilityEvent;
 import android.widget.FrameLayout;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.customview.view.AbsSavedState;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A view switcher similar to a {@link androidx.viewpager.widget.ViewPager}
@@ -55,6 +55,7 @@ public class ViewSwitcher extends FrameLayout {
 
     static class ItemInfo {
         Object object;
+        int position;
     }
 
     private ItemInfo mCurrItemInfo = null;
@@ -261,6 +262,9 @@ public class ViewSwitcher extends FrameLayout {
             requestLayout();
         } else {
             populate(item);
+            if (dispatchSelected) {
+                dispatchOnPageSelected(item);
+            }
         }
     }
 
@@ -304,6 +308,7 @@ public class ViewSwitcher extends FrameLayout {
 
     ItemInfo addNewItem(int position) {
         ItemInfo ii = new ItemInfo();
+        ii.position = position;
         ii.object = mAdapter.instantiateItem(this, position);
         mCurrItemInfo = ii;
         return ii;
@@ -318,20 +323,29 @@ public class ViewSwitcher extends FrameLayout {
         int newCurrItem = mCurItem;
 
         boolean isUpdating = false;
-        if (mCurrItemInfo != null) {
-            final int newPos = mAdapter.getItemPosition(mCurrItemInfo.object);
+        ItemInfo ii = mCurrItemInfo;
+        if (ii != null) {
+            final int newPos = mAdapter.getItemPosition(ii.object);
 
             if (newPos == PagerAdapter.POSITION_NONE) {
+                mCurrItemInfo = null;
+
                 mAdapter.startUpdate(this);
                 isUpdating = true;
 
-                mAdapter.destroyItem(this, mCurItem, mCurrItemInfo.object);
-                mCurrItemInfo = null;
-                newCurrItem = Math.max(0, Math.min(mCurItem, adapterCount - 1));
+                mAdapter.destroyItem(this, mCurItem, ii.object);
                 needPopulate = true;
-            } else if (mCurItem != newPos) {
-                // Our current item changed position. Follow it.
-                newCurrItem = newPos;
+
+                if (mCurItem == ii.position) {
+                    newCurrItem = Math.max(0, Math.min(mCurItem, adapterCount - 1));
+                    needPopulate = true;
+                }
+            } else if (ii.position != newPos) {
+                if (ii.position == mCurItem) {
+                    // Our current item changed position. Follow it.
+                    newCurrItem = newPos;
+                }
+                ii.position = newPos;
                 needPopulate = true;
             }
         }
@@ -351,6 +365,10 @@ public class ViewSwitcher extends FrameLayout {
     }
 
     void populate(int newCurrentItem) {
+        if (mCurItem != newCurrentItem) {
+            mCurItem = newCurrentItem;
+        }
+
         if (mAdapter == null) {
             return;
         }
@@ -390,16 +408,12 @@ public class ViewSwitcher extends FrameLayout {
                     + " Problematic adapter: " + mAdapter.getClass());
         }
 
-        if (mCurrItemInfo != null && mCurItem != newCurrentItem) {
-            mAdapter.destroyItem(this, mCurItem, mCurrItemInfo.object);
+        if (mCurrItemInfo != null && mCurrItemInfo.position != newCurrentItem) {
+            mAdapter.destroyItem(this, mCurrItemInfo.position, mCurrItemInfo.object);
         }
 
-        if ((mCurrItemInfo == null || mCurItem != newCurrentItem) && N > 0) {
+        if ((mCurrItemInfo == null || mCurrItemInfo.position != newCurrentItem) && N > 0) {
             mCurrItemInfo = addNewItem(newCurrentItem);
-            if (mCurItem != newCurrentItem) {
-                mCurItem = newCurrentItem;
-                dispatchOnPageSelected(newCurrentItem);
-            }
             mAdapter.setPrimaryItem(this, mCurItem, mCurrItemInfo.object);
         }
 
@@ -557,6 +571,16 @@ public class ViewSwitcher extends FrameLayout {
         return infoForChild(child);
     }
 
+    ItemInfo infoForPosition(int position) {
+        ItemInfo ii = mCurrItemInfo;
+        if (ii != null) {
+            if (ii.position == position) {
+                return ii;
+            }
+        }
+        return null;
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -569,7 +593,7 @@ public class ViewSwitcher extends FrameLayout {
         mInLayout = true;
         populate();
         mInLayout = false;
-}
+    }
 
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
